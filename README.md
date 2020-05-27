@@ -4,4 +4,4 @@
 
 [2.文字電流效果](https://virtools.github.io/electricity/demo2/)
 
-<a href="網址" target="_blank">連結</a>
+<a href="https://virtools.github.io/electricity/demo2/" target="_blank">連結</a>
