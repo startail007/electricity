@@ -1,9 +1,5 @@
 # 電流效果
 
-### 演示 01
+[1.曲線電流效果](https://virtools.github.io/electricity/demo1/)
 
-[線上觀看](https://virtools.github.io/electricity/demo1/)
-
-### 演示 02
-
-[線上觀看](https://virtools.github.io/electricity/demo2/)
+[2.文字電流效果](https://virtools.github.io/electricity/demo2/)
