@@ -265,7 +265,7 @@
         return [x, y];
       }
 
-      function getTextData(s, font, x, y) {
+      function getTextData(s, font) {
         if (s.length <= 0) return;
         let pool = document.createElement("canvas");
         let buffer = pool.getContext("2d");
@@ -306,7 +306,7 @@
                 temp.data[index + 1] = 255;
                 temp.data[index + 2] = 255;
                 temp.data[index + 3] = 255;
-                posList.push([i + x, j + y]);
+                posList.push([i, j]);
               }
             }
           }
@@ -342,15 +342,14 @@
           posListG.push(posList.slice(index, spliceList[i]));
           index = spliceList[i];
         }
-        console.log(posListG);
 
-        buffer.putImageData(temp, 0, 0);
+        /*buffer.putImageData(temp, 0, 0);
         buffer.fillStyle = "#ff0000";
         let base64 = pool.toDataURL();
         let image = new Image();
-        image.src = base64;
+        image.src = base64;*/
 
-        return { imageData, base64, image, posList, posListG };
+        return { width: imageData.width, height: imageData.height, posList, posListG };
       }
 
       function getNearestDistance(pos, posList) {
@@ -393,17 +392,16 @@
         mPos[0] = el.clientX;
         mPos[1] = el.clientY;
       });
-      let text = "ELECTRICITY";
+      let text = "POWER";
       let textFont = "bold 100px Courier New";
-      let textX = 50;
-      let textY = 200;
-      let textData = getTextData(text, textFont, textX, textY);
+      let textData = getTextData(text, textFont);
+      let textPos = [cWidth * 0.5 - textData.width * 0.5, cHeight * 0.5 - textData.height * 0.5];
 
       let text_posListG = textData.posListG;
 
       let text_data = [];
 
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 10; i++) {
         text_data.push({ id: -1, angleList: [], indexPos: [], transform: [], reset: true });
       }
 
@@ -423,15 +421,19 @@
 
         //setShadow(0, 0, 2 * 2, "#00ffff");
         //ctx.drawImage(text.image, 50, 200);
+
+        let temp_mPos = getVector(textPos, mPos);
+        ctx.save();
+        ctx.translate(textPos[0], textPos[1]);
         ctx.globalCompositeOperation = "lighter";
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
 
-        let indexData = getNearestDistance(mPos, text_posListG);
+        let indexData = getNearestDistance(temp_mPos, text_posListG);
         let dischargeRange = 200;
         let discharge = indexData.r < dischargeRange;
 
-        for (let i = 0; i < (discharge ? text_data.length : 5); i++) {
+        for (let i = 0; i < (discharge ? text_data.length : 3); i++) {
           let id = text_data[i].id;
           let angleList = text_data[i].angleList;
           let indexPos = text_data[i].indexPos;
@@ -499,7 +501,7 @@
         let measureText = ctx.measureText(text);
         let th = measureText.actualBoundingBoxAscent + measureText.actualBoundingBoxDescent;
         ctx.fillStyle = "#ffffff";
-        ctx.fillText(text, 0 + textX, th + textY);
+        ctx.fillText(text, 0, th);
 
         if (indexData.r < dischargeRange) {
           if (Math.random() > 0.9) {
@@ -513,21 +515,16 @@
 
           let m = indexData.r / main_angleList.length;
           let electricityData = getElectricityData(main_angleList, m, 40 * m, 40);
-          let posList = electricityFun.setPosToLine(electricityData, mPos, pp);
+          let posList = electricityFun.setPosToLine(electricityData, temp_mPos, pp);
 
-          let rate = 0.25 + 0.75 * (1 - indexData.r / dischargeRange);
+          let main_rate = 0.25 + 0.75 * (1 - indexData.r / dischargeRange);
 
-          setShadow(0, 0, 3 * rate * 5, "#00ffff");
+          setShadow(0, 0, 3 * main_rate * 5, "#00ffff");
           ctx.strokeStyle = "#ffffff";
-          drawElectricity(posList, 3 * rate);
+          drawElectricity(posList, 3 * main_rate);
 
-          ctx.beginPath();
-          ctx.fillStyle = "#ffffff";
-          ctx.arc(pp[0], pp[1], 3 * rate, 0, 2 * Math.PI);
-          ctx.fill();
-
-          //clearShadow();
-          drawLight(pp, 10 * rate + Math.random() * 10);
+          clearShadow();
+          drawLight(pp, 10 * main_rate + Math.random() * 10);
           for (let i = 0; i < sub_data.length; i++) {
             let angleList = sub_data[i].angleList;
             let indexPos = sub_data[i].indexPos;
@@ -556,20 +553,22 @@
             let r = getDistance(pp0, pp1);
             if (r < 50) {
               adjustmentElectricityAngle(angleList, 0.3, 0.1, randomSeedList);
-              let rate = 0.25 + 0.75 * (1 - r / 50);
+              let rate = (0.25 + 0.75 * (1 - r / 50)) * main_rate;
               sub_data[i].reset = false;
               let m = r / angleList.length;
               let posList0 = getElectricity(pp0, pp1, angleList, m, 40 * m, 40);
-              setShadow(0, 0, 2 * rate * 5, "#00ffff");
+              setShadow(0, 0, 3 * rate * 5, "#00ffff");
               ctx.strokeStyle = "#ffffff";
-              drawElectricity(posList0, 2 * rate);
+              drawElectricity(posList0, 3 * rate);
 
-              drawLight(pp1, 5 * rate + Math.random() * 5);
+              drawLight(pp1, 10 * rate + Math.random() * 10);
             } else {
               sub_data[i].reset = true;
             }
           }
         }
+
+        ctx.restore();
       }
       update();
       let oldTime = Date.now();
