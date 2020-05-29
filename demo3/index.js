@@ -115,28 +115,6 @@ function drawLight(ctx, pp, rr) {
   ctx.fillStyle = gradient;
   ctx.arc(pp[0], pp[1], rr, 0, 2 * Math.PI);
   ctx.fill();
-
-  /*setShadow(ctx, 0, 0, rr, "#00ffff");
-      ctx.beginPath();
-      ctx.fillStyle = "#ffffff";
-      ctx.arc(pp[0], pp[1], 1, 0, 2 * Math.PI);
-      ctx.fill();*/
-
-  //setShadow(ctx, 0, 0, rr * 10, "#ff0000");
-  /*ctx.beginPath();
-      ctx.fillStyle = "#ffffff02";
-      ctx.arc(pp[0], pp[1], 10, 0, 2 * Math.PI);
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.fillStyle = "#ffffff22";
-      ctx.arc(pp[0], pp[1], 5, 0, 2 * Math.PI);
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.fillStyle = "#ffffff42";
-      ctx.arc(pp[0], pp[1], 2, 0, 2 * Math.PI);
-      ctx.fill();*/
 }
 
 function drawE(ctx, electricity, pp0, pp1, r, lineWidth, glow, light0, light1) {
@@ -146,14 +124,14 @@ function drawE(ctx, electricity, pp0, pp1, r, lineWidth, glow, light0, light1) {
   electricity.update();
   electricity.flow(pp0, pp1);
   electricity.render(ctx, "#ffffff", lineWidth, "#00ffff", glow);
-  //ctx.globalAlpha = 0.5;
+  ctx.globalAlpha = 0.5;
   if (light0) {
     drawLight(ctx, pp0, light0);
   }
   if (light1) {
     drawLight(ctx, pp1, light1);
   }
-  //ctx.globalAlpha = 1;
+  ctx.globalAlpha = 1;
 }
 
 function getArrayCycle(ary, value) {
@@ -176,7 +154,7 @@ cHeight = canvas.height;
 
 let mPos = [0, 0];
 
-window.addEventListener("mousemove", function (el) {
+canvas.addEventListener("mousemove", function (el) {
   mPos[0] = el.clientX;
   mPos[1] = el.clientY;
 });
@@ -201,6 +179,8 @@ let main_electricity = new Electricity(50, 0.05, 0.15);
 let sub_data = [];
 for (let i = 0; i < 2; i++) {
   let sub_electricity = new Electricity(20);
+  //sub_electricity.setSegmentAngleParameter(0.05, 0.15);
+  //sub_electricity.setSegmentPosParameter(1, 20, 20);
   sub_data.push({ electricity: sub_electricity, indexPos: [], transform: [], reset: true });
 }
 
@@ -225,6 +205,16 @@ function update() {
   let indexData = getNearestDistance(temp_mPos, text_posListG);
   let dischargeRange = 200;
   let discharge = indexData.r < dischargeRange;
+
+  setShadow(ctx, 0, 0, 2 * 5, "#00ffff");
+  ctx.font = textFont;
+  let measureText = ctx.measureText(text);
+  let th = measureText.actualBoundingBoxAscent + measureText.actualBoundingBoxDescent;
+  ctx.fillStyle = discharge ? "#ffffffee" : "#ffffffcc";
+  ctx.fillText(text, 0, th);
+  /*ctx.lineWidth = 3;
+  ctx.strokeStyle = "#ffffff66";
+  ctx.strokeText(text, 0, th);*/
 
   for (let i = 0; i < (discharge ? text_data.length : 3); i++) {
     let id = text_data[i].id;
@@ -262,7 +252,6 @@ function update() {
       let rand = 1 + Math.random();
       drawE(ctx, electricity, startPos, endPos, r, rand, rand * 2, rand * 8, rand * 8);
 
-      //if (Math.random() > (discharge ? 0.7 : 0.9)) {
       if (bool || Math.random() > 0.95) {
         particles.push(
           new Spark(
@@ -285,13 +274,6 @@ function update() {
     }
   }
 
-  setShadow(ctx, 0, 0, 2 * 5, "#00ffff");
-  ctx.font = textFont;
-  let measureText = ctx.measureText(text);
-  let th = measureText.actualBoundingBoxAscent + measureText.actualBoundingBoxDescent;
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText(text, 0, th);
-
   if (indexData.r < dischargeRange) {
     if (Math.random() > 0.9) {
       main_electricity.init();
@@ -311,7 +293,7 @@ function update() {
       3 * main_rate,
       3 * main_rate * 5,
       0,
-      30 * (main_rate + Math.random())
+      100 * (main_rate + 0.5 * Math.random())
     );
     let angle = Math.atan2(pp[1] - temp_mPos[1], pp[0] - temp_mPos[0]);
     if (Math.random() > 0.5) {
@@ -358,7 +340,7 @@ function update() {
         transform[1] = shake(transform[1], 2, 20);
         sub_data[i].reset = false;
         let rate = (0.25 + 0.75 * (1 - r / 50)) * 0.7 + main_rate * 0.3;
-        drawE(ctx, electricity, pp0, pp1, r, 3 * rate, 3 * rate * 5, 0, 30 * (rate + Math.random()));
+        drawE(ctx, electricity, pp0, pp1, r, 3 * rate, 3 * rate * 5, 0, 100 * (rate + 0.5 * Math.random()));
         if (Math.random() > 0.5) {
           //for (let i = 0; i < 2; i++) {
           particles.push(
@@ -391,6 +373,7 @@ function update() {
 
   setShadow(ctx, 0, 0, 2 * 5, "#00ffff");
   particles.forEach((s) => s.render(ctx, "#ffffff"));
+  ctx.globalAlpha = 1;
 
   ctx.restore();
 }
@@ -407,7 +390,6 @@ let animate = function () {
   count += delta;
   if (count >= 0.02) {
     count %= 0.02;
-    ctx.globalAlpha = 1;
     update();
   }
 };
