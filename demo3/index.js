@@ -1,5 +1,5 @@
 import { getVector, pushVector, getDistance } from "./vector.js";
-import { setShadow, clearShadow, numberCrop } from "./base.js";
+import { setShadow, clearShadow, numberCrop, debounce } from "./base.js";
 import { Spark } from "./spark.js";
 import { Electricity } from "./electricity.js";
 function getTextData(s, font) {
@@ -155,8 +155,8 @@ cHeight = canvas.height;
 let mPos = [0, 0];
 
 canvas.addEventListener("mousemove", function (el) {
-  mPos[0] = el.clientX;
-  mPos[1] = el.clientY;
+  mPos[0] = el.offsetX;
+  mPos[1] = el.offsetY;
 });
 let text = "POWER";
 let textFont = "bold 100px Courier New";
@@ -184,8 +184,10 @@ for (let i = 0; i < 2; i++) {
   sub_data.push({ electricity: sub_electricity, indexPos: [], transform: [], reset: true });
 }
 
-/*let gradient = ctx.createRadialGradient(0, 0, 2, 100, 100, 5);
-    console.log(gradient);*/
+/*function handleScroll() {
+  console.log("aaa");
+}
+window.addEventListener("mousemove", debounce(handleScroll));*/
 function update() {
   ctx.clearRect(0, 0, cWidth, cHeight);
   clearShadow(ctx);

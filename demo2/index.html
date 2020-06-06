@@ -387,8 +387,8 @@
       let mPos = [400, 400];
 
       window.addEventListener("mousemove", function (el) {
-        mPos[0] = el.clientX;
-        mPos[1] = el.clientY;
+        mPos[0] = el.offsetX;
+        mPos[1] = el.offsetY;
       });
       let text = "POWER";
       let textFont = "bold 100px Courier New";

@@ -1,3 +1,4 @@
+import { rotate } from "./vector.js";
 class Spark {
   constructor(
     pos = [0, 0],
@@ -43,31 +44,24 @@ class Spark {
     //this.angular = this.options.angular_range * (1 - Math.random() * 2);
     this.lifespan = Math.round(this.options.lifespan + this.options.lifespan_range * Math.random());
     this.maxlife = this.lifespan;
+    this.swing = Math.random();
   }
   update() {
     this.prevPos[0] = this.pos[0];
     this.prevPos[1] = this.pos[1];
     this.pos[0] += this.velocityPos[0];
     this.pos[1] += this.velocityPos[1];
+    let swing = rotate([Math.sin(this.swing * 2 * Math.PI), 0], Math.atan2(this.velocityPos[0], -this.velocityPos[1]));
+    let rate = this.lifespan / this.maxlife;
+    this.velocityPos[0] += rate * swing[0];
+    this.velocityPos[1] += rate * swing[1];
     this.velocityPos[0] += Math.cos(this.options.gravity_direct) * this.options.gravity;
     this.velocityPos[1] += Math.sin(this.options.gravity_direct) * this.options.gravity;
+
     this.velocityPos[0] *= this.options.friction;
     this.velocityPos[1] *= this.options.friction;
-    //this.pos[0] += Math.cos(this.direct) * this.velocity;
-    //this.pos[0] += Math.cos(this.options.gravity_direct) * this.options.gravity;
-    //this.pos[1] += Math.sin(this.direct) * this.velocity;
-    //this.pos[1] += Math.sin(this.options.gravity_direct) * this.options.gravity;
-    /*if (this.velocity > 0.2) {
-      this.velocity *= this.options.friction;
-    }*/
-    //this.direct = Math.atan2(this.pos[1] - this.prevPos[1], this.pos[0] - this.prevPos[0]);
-    /*this.direct += this.angular;
-    if (
-      this.direct > this.options.direct + this.options.angular_limit ||
-      this.direct < this.options.direct - this.options.angular_limit
-    ) {
-      this.angular *= -1;
-    }*/
+    this.swing += 0.1;
+    this.swing %= 1;
     this.lifespan > 0 && this.lifespan--;
   }
   render(ctx, strokeStyle) {
