@@ -27,7 +27,7 @@ function getTextData(s, font) {
     [-1, 0],
   ];
   const posList = [];
-  const temp = ctx.createImageData(imageData.width, imageData.height);
+  const temp = buffer.createImageData(imageData.width, imageData.height);
   for (let j = 0; j < imageData.height; j++) {
     for (let i = 0; i < imageData.width; i++) {
       const index = getIndex(imageData, i, j);
