@@ -18,7 +18,7 @@ function getTextData(s, font) {
   buffer.textBaseline = "hanging";
   buffer.font = font;
   buffer.fillStyle = "#ffffff";
-  buffer.fillText(s, 0, 0);
+  buffer.fillText(s, 0, measureText.actualBoundingBoxAscent);
   const imageData = buffer.getImageData(0, 0, pool.width, pool.height);
   const data = imageData.data;
   function getIndex(imageData, x, y) {
@@ -215,10 +215,10 @@ function update() {
   ctx.textAlign = "start";
   ctx.textBaseline = "hanging";
   ctx.font = textFont;
-  //const measureText = ctx.measureText(text);
-  //const th = measureText.actualBoundingBoxDescent - measureText.actualBoundingBoxAscent;
+  const measureText = ctx.measureText(text);
+  const th = measureText.actualBoundingBoxDescent + measureText.actualBoundingBoxAscent;
   ctx.fillStyle = discharge ? "#ffffffee" : "#ffffffcc";
-  ctx.fillText(text, 0, 0);
+  ctx.fillText(text, 0, measureText.actualBoundingBoxAscent);
   /*ctx.lineWidth = 3;
   ctx.strokeStyle = "#ffffff66";
   ctx.strokeText(text, 0, th);*/
