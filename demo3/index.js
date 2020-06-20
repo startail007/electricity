@@ -199,7 +199,7 @@ function update() {
   const temp_mPos = getVector(textPos, mPos);
   ctx.save();
   ctx.translate(textPos[0], textPos[1]);
-  ctx.globalCompositeOperation = "lighter";
+  //ctx.globalCompositeOperation = "lighter";
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
 
