@@ -6,15 +6,19 @@ function getTextData(s, font) {
   if (s.length <= 0) return;
   const pool = document.createElement("canvas");
   const buffer = pool.getContext("2d");
+  buffer.textAlign = "start";
+  buffer.textBaseline = "hanging";
   buffer.font = font;
   const measureText = buffer.measureText(s);
   const tw = measureText.width;
-  const th = measureText.actualBoundingBoxAscent + measureText.actualBoundingBoxDescent;
+  const th = measureText.actualBoundingBoxDescent + measureText.actualBoundingBoxAscent;
   pool.width = tw;
-  pool.height = th + 2;
+  pool.height = th;
+  buffer.textAlign = "start";
+  buffer.textBaseline = "hanging";
   buffer.font = font;
   buffer.fillStyle = "#ffffff";
-  buffer.fillText(s, 0, th);
+  buffer.fillText(s, 0, 0);
   const imageData = buffer.getImageData(0, 0, pool.width, pool.height);
   const data = imageData.data;
   function getIndex(imageData, x, y) {
@@ -208,11 +212,13 @@ function update() {
   const discharge = indexData.r < dischargeRange;
 
   setShadow(ctx, 0, 0, 2 * 5, "#00ffff");
+  ctx.textAlign = "start";
+  ctx.textBaseline = "hanging";
   ctx.font = textFont;
-  const measureText = ctx.measureText(text);
-  const th = measureText.actualBoundingBoxAscent + measureText.actualBoundingBoxDescent;
+  //const measureText = ctx.measureText(text);
+  //const th = measureText.actualBoundingBoxDescent - measureText.actualBoundingBoxAscent;
   ctx.fillStyle = discharge ? "#ffffffee" : "#ffffffcc";
-  ctx.fillText(text, 0, th);
+  ctx.fillText(text, 0, 0);
   /*ctx.lineWidth = 3;
   ctx.strokeStyle = "#ffffff66";
   ctx.strokeText(text, 0, th);*/
